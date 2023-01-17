@@ -1,3 +1,7 @@
+const allure = require("allure-commandline");
+const commands = require("./utils/commands.js");
+import fs from "fs";
+
 export const config = {
   //
   // ====================
@@ -165,8 +169,11 @@ export const config = {
    * @param {Object} config wdio configuration object
    * @param {Array.<Object>} capabilities list of capabilities details
    */
-  // onPrepare: function (config, capabilities) {
-  // },
+  onPrepare: function (config, capabilities) {
+    if (fs.existsSync("./allure-results")) {
+      fs.rmSync("./allure-results", { recursive: true });
+    }
+  },
   /**
    * Gets executed before a worker process is spawned and can be used to initialise specific service
    * for that worker as well as modify runtime environments in an async fashion.
@@ -211,8 +218,11 @@ export const config = {
    * @param {String} commandName hook command name
    * @param {Array} args arguments that command would receive
    */
-  // beforeCommand: function (commandName, args) {
-  // },
+  beforeCommand: function (commandName, args) {
+    Object.keys(commands).forEach((key) => {
+      browser.addCommand(key, commands[key]);
+    });
+  },
   /**
    * Hook that gets executed before the suite starts
    * @param {Object} suite suite details
@@ -238,6 +248,7 @@ export const config = {
    */
   // afterHook: function (test, context, { error, result, duration, passed, retries }) {
   // },
+
   /**
    * Function to be executed after a test (in Mocha/Jasmine only)
    * @param {Object}  test             test object
@@ -248,8 +259,11 @@ export const config = {
    * @param {Boolean} result.passed    true if test has passed, otherwise false
    * @param {Object}  result.retries   informations to spec related retries, e.g. `{ attempts: 0, limit: 0 }`
    */
-  // afterTest: function(test, context, { error, result, duration, passed, retries }) {
-  // },
+  // afterTest: async function (
+  //   test,
+  //   context,
+  //   { error, result, duration, passed, retries }
+  // ) {},
 
   /**
    * Hook that gets executed after the suite has ended
@@ -291,8 +305,24 @@ export const config = {
    * @param {Array.<Object>} capabilities list of capabilities details
    * @param {<Object>} results object containing test results
    */
-  // onComplete: function(exitCode, config, capabilities, results) {
-  // },
+  onComplete: function (exitCode, config, capabilities, results) {
+    const reportError = new Error("Could not generate Allure report");
+    const generation = allure(["generate", "allure-results", "--clean"]);
+    return new Promise((resolve, reject) => {
+      const generationTimeout = setTimeout(() => reject(reportError), 10000);
+
+      generation.on("exit", function (exitCode) {
+        clearTimeout(generationTimeout);
+
+        if (exitCode !== 0) {
+          return reject(reportError);
+        }
+
+        console.log("Allure report successfully generated");
+        resolve();
+      });
+    });
+  },
   /**
    * Gets executed when a refresh happens.
    * @param {String} oldSessionId session ID of the old session
