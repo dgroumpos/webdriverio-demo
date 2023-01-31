@@ -6,14 +6,16 @@ describe("Log in to the application with various types of users", () => {
     await browser.step(
       "User enters their username and password",
       async function () {
-        await loginPage.userName.setValue("standard_user");
-        await loginPage.password.setValue("secret_sauce");
+        await loginPage.userName.setValue(loginPage.standardUserNameText);
+        await loginPage.password.setValue(loginPage.passwordText);
       }
     );
 
     await browser.step("User clicks on the login button", async function () {
       await loginPage.loginBtn.click();
-      await expect(productsPage.pageHeader).toHaveText("Products".toUpperCase());
+      await expect(productsPage.pageHeader).toHaveText(
+        productsPage.pageHeaderText.toUpperCase()
+      );
     });
 
     await browser.step(
@@ -22,6 +24,26 @@ describe("Log in to the application with various types of users", () => {
         await productsPage.hamburgerBtn.click();
         await productsPage.logoutLink.click();
         await expect(loginPage.loginBtn).toBeDisplayed();
+      }
+    );
+  });
+
+  it("Log in with invalid credentials", async () => {
+    await browser.step(
+      "User enters their username and an invalid password",
+      async function () {
+        await loginPage.userName.setValue(loginPage.standardUserNameText);
+        await loginPage.password.setValue("wrongPassword");
+      }
+    );
+
+    await browser.step(
+      "User clicks on the login button. The error message is displayed",
+      async function () {
+        await loginPage.loginBtn.click();
+        await expect(loginPage.errorMessage).toHaveText(
+          loginPage.invalidCredentialsText
+        );
       }
     );
   });
