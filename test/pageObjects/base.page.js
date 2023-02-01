@@ -1,3 +1,8 @@
 export default class BasePage {
-  constructor() {}
+  constructor() {
+    this.dummyText = "dummyText";
+  }
+  getDummy() {
+    return "dummy";
+  }
 }
