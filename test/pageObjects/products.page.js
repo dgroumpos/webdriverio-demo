@@ -32,6 +32,10 @@ class ProductsPage extends BasePage {
     return $(".shopping_cart_badge");
   }
 
+  get cartIcon(){
+    return $(".shopping_cart_link");
+  }
+
   //FUNCTIONS
   getAddToCartBtn(productName) {
     return $(`//div[@class="inventory_item_description" and contains(.//div, '${productName}')]//button`);
