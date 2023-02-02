@@ -32,7 +32,7 @@ class ProductsPage extends BasePage {
     return $(".shopping_cart_badge");
   }
 
-  get cartIcon(){
+  get cartIcon() {
     return $(".shopping_cart_link");
   }
 
