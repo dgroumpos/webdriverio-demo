@@ -7,14 +7,15 @@ module.exports = {
       await body();
     } catch (error) {
       status = "failed";
-    }
-    await allureReporter.addStep(title, {}, status);
-    await allureReporter.startStep();
-    await browser.takeScreenshot();
-    await allureReporter.endStep(status);
-    //Temporary solution to fail the test
-    if (status === "failed") {
-      expect(true).toBe(false);
+    } finally {
+      await allureReporter.addStep(title, {}, status);
+      await allureReporter.startStep();
+      await browser.takeScreenshot();
+      await allureReporter.endStep(status);
+      //Throws an error so as to fail the test
+      if (status === "failed") {
+        throw new Error(`STEP : ${title} has failed`);
+      }
     }
   },
 };

@@ -15,7 +15,7 @@ export const config = {
   // Specify Test Files
   // ==================
   // Define which test specs should run. The pattern is relative to the directory
-  // from which `wdio` was called.
+  // of the configuration file being run.
   //
   // The specs are defined as an array of spec files (optionally using wildcards
   // that will be expanded). The test for each spec file will be run in a separate
@@ -26,7 +26,7 @@ export const config = {
   // then the current working directory is where your `package.json` resides, so `wdio`
   // will be called from there.
   //
-  specs: ["./test/specs/**/*.js"],
+  specs: [["./test/specs/**/*.js"]],
   // Patterns to exclude.
   exclude: [
     // 'path/to/excluded/files'
@@ -123,7 +123,7 @@ export const config = {
   //
   // Make sure you have the wdio adapter package for the specific framework installed
   // before running any tests.
-  framework: "mocha",
+  framework: "jasmine",
   //
   // The number of times to retry the entire specfile when it fails as a whole
   // specFileRetries: 1,
@@ -150,12 +150,19 @@ export const config = {
   ],
 
   //
-  // Options to be passed to Mocha.
-  // See the full list at http://mochajs.org/
-  mochaOpts: {
-    ui: "bdd",
-    timeout: 60000,
+  // Options to be passed to Jasmine.
+  jasmineOpts: {
+    // Jasmine default timeout
+    defaultTimeoutInterval: 60000,
+    //
+    // The Jasmine framework allows interception of each assertion in order to log the state of the application
+    // or website depending on the result. For example, it is pretty handy to take a screenshot every time
+    // an assertion fails.
+    expectationResultHandler: function (passed, assertion) {
+      // do something
+    },
   },
+
   //
   // =====
   // Hooks
@@ -232,9 +239,10 @@ export const config = {
   /**
    * Function to be executed before a test (in Mocha/Jasmine) starts.
    */
-  beforeTest: function (test, context) {
-    browser.maximizeWindow();
-    browser.url(this.baseUrl);
+  beforeTest: async function (test, context) {
+    await browser.reloadSession();
+    await browser.maximizeWindow();
+    await browser.url(this.baseUrl);
   },
   /**
    * Hook that gets executed _before_ a hook within the suite starts (e.g. runs before calling
@@ -248,7 +256,6 @@ export const config = {
    */
   // afterHook: function (test, context, { error, result, duration, passed, retries }) {
   // },
-
   /**
    * Function to be executed after a test (in Mocha/Jasmine only)
    * @param {Object}  test             test object
@@ -259,11 +266,8 @@ export const config = {
    * @param {Boolean} result.passed    true if test has passed, otherwise false
    * @param {Object}  result.retries   informations to spec related retries, e.g. `{ attempts: 0, limit: 0 }`
    */
-  // afterTest: async function (
-  //   test,
-  //   context,
-  //   { error, result, duration, passed, retries }
-  // ) {},
+  // afterTest: function (test, context, { error, result, duration, passed, retries }) {
+  // },
 
   /**
    * Hook that gets executed after the suite has ended
