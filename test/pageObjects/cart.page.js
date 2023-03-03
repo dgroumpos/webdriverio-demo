@@ -4,14 +4,14 @@ class CartPage extends BasePage {
   constructor() {
     super();
     //TESTDATA
-    this.headerText = "YOUR CART";
-    this.infoPageHeaderText = "CHECKOUT: YOUR INFORMATION";
+    this.headerText = "Your Cart";
+    this.infoPageHeaderText = "Checkout: Your Information";
     this.errorText = "Error: First Name is required";
     this.firstName = "John";
     this.lastName = "Doe";
     this.zip = "12345";
-    this.overviewPageHeaderText = "CHECKOUT: OVERVIEW";
-    this.completeHeaderText = "THANK YOU FOR YOUR ORDER";
+    this.overviewPageHeaderText = "Checkout: Overview";
+    this.completeHeaderText = "Thank you for your order!";
   }
 
   //LOCATORS
@@ -53,7 +53,9 @@ class CartPage extends BasePage {
 
   //FUNCTIONS
   getCartItem(itemName) {
-    return $(`//a/div[contains(text(), '${itemName}')]//ancestor::div[@class='cart_item']`);
+    return $(
+      `//a/div[contains(text(), '${itemName}')]//ancestor::div[@class='cart_item']`
+    );
   }
 
   removeItemFromCart(itemName) {
