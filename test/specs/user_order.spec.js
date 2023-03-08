@@ -1,10 +1,64 @@
 import loginPage from "../pageObjects/login.page";
 import productsPage from "../pageObjects/products.page";
 import cartPage from "../pageObjects/cart.page";
+import testHelper from "../../utils/testHelper";
 
-describe("Select products and place orders", () => {
-  it("Add an item to the cart and open the cart to verify it has been added", async () => {
-    await browser.step(
+testHelper.suite("Select products and place orders", () => {
+  testHelper.tc(
+    "Add an item to the cart and open the cart to verify it has been added",
+    async () => {
+      await testHelper.step(
+        "User logs in to the application. Products page is displayed",
+        async function () {
+          await loginPage.login(
+            loginPage.standardUserNameText,
+            loginPage.passwordText
+          );
+          await expect(productsPage.pageHeader).toHaveText(
+            productsPage.pageHeaderText
+          );
+        }
+      );
+
+      await testHelper.step(
+        'User adds a "Sauce Labs Bolt T-Shirt" to their cart. Button text changes to "REMOVE". Shopping cart Quantity changes to 1',
+        async function () {
+          await productsPage
+            .getAddToCartBtn(productsPage.listOfProducts.boltTShirt)
+            .click();
+          await expect(
+            productsPage.getAddToCartBtn(productsPage.listOfProducts.boltTShirt)
+          ).toHaveText("Remove");
+          await expect(productsPage.cartQuantityIcon).toHaveText("1");
+        }
+      );
+
+      await testHelper.step(
+        "User navigates to the cart and verifies item has been added",
+        async function () {
+          await productsPage.cartIcon.click();
+          await expect(cartPage.pageHeader).toHaveText(cartPage.headerText);
+          await expect(
+            cartPage.getCartItem(cartPage.listOfProducts.boltTShirt)
+          ).toBeDisplayed();
+        }
+      );
+
+      await testHelper.step(
+        "User removes the item from the cart and verifies it is no longer displayed",
+        async function () {
+          await cartPage.removeItemFromCart(cartPage.listOfProducts.boltTShirt);
+          await expect(
+            cartPage.getCartItem(cartPage.listOfProducts.boltTShirt)
+          ).not.toBeDisplayed();
+          await expect(productsPage.cartQuantityIcon).not.toBeDisplayed();
+        }
+      );
+    }
+  );
+
+  testHelper.tc("Complete an order", async () => {
+    await testHelper.step(
       "User logs in to the application. Products page is displayed",
       async function () {
         await loginPage.login(
@@ -17,57 +71,7 @@ describe("Select products and place orders", () => {
       }
     );
 
-    await browser.step(
-      'User adds a "Sauce Labs Bolt T-Shirt" to their cart. Button text changes to "REMOVE". Shopping cart Quantity changes to 1',
-      async function () {
-        await productsPage
-          .getAddToCartBtn(productsPage.listOfProducts.boltTShirt)
-          .click();
-        await expect(
-          productsPage.getAddToCartBtn(productsPage.listOfProducts.boltTShirt)
-        ).toHaveText("Remove");
-        await expect(productsPage.cartQuantityIcon).toHaveText("1");
-      }
-    );
-
-    await browser.step(
-      "User navigates to the cart and verifies item has been added",
-      async function () {
-        await productsPage.cartIcon.click();
-        await expect(cartPage.pageHeader).toHaveText(cartPage.headerText);
-        await expect(
-          cartPage.getCartItem(cartPage.listOfProducts.boltTShirt)
-        ).toBeDisplayed();
-      }
-    );
-
-    await browser.step(
-      "User removes the item from the cart and verifies it is no longer displayed",
-      async function () {
-        await cartPage.removeItemFromCart(cartPage.listOfProducts.boltTShirt);
-        await expect(
-          cartPage.getCartItem(cartPage.listOfProducts.boltTShirt)
-        ).not.toBeDisplayed();
-        await expect(productsPage.cartQuantityIcon).not.toBeDisplayed();
-      }
-    );
-  });
-
-  it("Complete an order", async () => {
-    await browser.step(
-      "User logs in to the application. Products page is displayed",
-      async function () {
-        await loginPage.login(
-          loginPage.standardUserNameText,
-          loginPage.passwordText
-        );
-        await expect(productsPage.pageHeader).toHaveText(
-          productsPage.pageHeaderText
-        );
-      }
-    );
-
-    await browser.step(
+    await testHelper.step(
       'User adds a "Sauce Labs Onesie", a "Sauce Labs Fleece Jacket" and a "Sauce Labs Backpack" to their cart. Shopping cart Quantity changes to 3',
       async function () {
         await productsPage
@@ -83,7 +87,7 @@ describe("Select products and place orders", () => {
       }
     );
 
-    await browser.step(
+    await testHelper.step(
       "User navigates to the cart and verifies item has been added",
       async function () {
         await productsPage.cartIcon.click();
@@ -100,7 +104,7 @@ describe("Select products and place orders", () => {
       }
     );
 
-    await browser.step(
+    await testHelper.step(
       "User clicks on the checkout button. Chekout information page is displayed",
       async function () {
         await cartPage.checkoutBtn.click();
@@ -110,7 +114,7 @@ describe("Select products and place orders", () => {
       }
     );
 
-    await browser.step(
+    await testHelper.step(
       'User clicks on the "Continue" button without filling the form. A validation error is displayed',
       async function () {
         await cartPage.continueBtn.click();
@@ -118,7 +122,7 @@ describe("Select products and place orders", () => {
       }
     );
 
-    await browser.step(
+    await testHelper.step(
       'User fills in their information and clicks on the "Continue" button. "Checkout Overview" page is displayed',
       async function () {
         await cartPage.completeInfoForm(
@@ -133,7 +137,7 @@ describe("Select products and place orders", () => {
       }
     );
 
-    await browser.step(
+    await testHelper.step(
       'User clicks on the "Finish"button. Order completion page is displayed',
       async function () {
         await cartPage.finishBtn.click();
