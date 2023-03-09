@@ -23,20 +23,25 @@ class TestHelper {
   }
 
   async step(title, body) {
-    var status = "passed";
+    let status = "passed";
+    let msg = "";
+
     try {
       await body();
     } catch (error) {
       status = "failed";
       this.passed = false;
+      msg = error.message;
       await console.log(`STEP [${title}] FAILED WITH ERROR: ${error.message}`);
-      // await allureReporter.addDescription(
-      //   `STEP [${title}] FAILED WITH ERROR: ${error.message}`
-      // );
     } finally {
       await allureReporter.addStep(title, {}, status);
       await allureReporter.startStep();
       await browser.takeScreenshot();
+      if (status === "failed") {
+        //REMOVE COLORING WITH REGEX
+        msg = msg.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, "");
+        await allureReporter.addAttachment("ERROR:", `<h3>${msg}</h3>`, "text/html");
+      }
       await allureReporter.endStep(status);
     }
   }
