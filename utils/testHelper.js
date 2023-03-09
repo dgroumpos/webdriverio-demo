@@ -9,7 +9,7 @@ class TestHelper {
       });
       afterEach(async () => {
         if (this.passed === false) {
-          expect(true).toBe(false);
+          fail("TEST HAS FAILED!");
         }
       });
       body();
